@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AskTheDocs - Tool</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+    <div class="container">
+        <header class="tool-header">
+            <a href="/" class="back-link">← Back to Home</a>
+            <h1 class="tool-title">Ask<span class="gradient-text">TheDocs</span></h1>
+        </header>
+
+        <main class="tool-main">
+            <div class="input-section">
+                <div class="input-group">
+                    <label for="url">Documentation URL</label>
+                    <input type="url" id="url" placeholder="https://example.com/docs/getting-started" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="question">Your Question</label>
+                    <textarea id="question" rows="3" placeholder="How do I install this package?" required></textarea>
+                </div>
+
+                <button id="askButton" class="submit-button">
+                    <span class="button-text">Ask Question</span>
+                    <span class="button-loader" style="display: none;">
+                        <span class="spinner"></span>
+                        Processing...
+                    </span>
+                </button>
+            </div>
+
+            <div id="responseSection" class="response-section" style="display: none;">
+                <h2 class="response-title">Answer</h2>
+                <div id="responseContent" class="response-content"></div>
+            </div>
+
+            <div id="errorSection" class="error-section" style="display: none;">
+                <div class="error-icon">⚠️</div>
+                <p id="errorMessage"></p>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/tool.js"></script>
+</body>
+
+</html>
