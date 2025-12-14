@@ -52,8 +52,6 @@ async function scrapeUrl(url) {
             text = text.substring(0, MAX_TEXT_LENGTH) + '...';
             console.log(`Text truncated to ${MAX_TEXT_LENGTH} characters`);
         }
-
-        console.log(`Extracted ${text.length} characters from ${url}`);
         return text;
 
     } catch (error) {

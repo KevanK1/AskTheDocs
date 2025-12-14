@@ -1,54 +1,322 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="light" lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AskTheDocs - Tool</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Research Engine - Ask Questions</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Spline+Sans:wght@300..700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f9f506",
+                        "background-light": "#f8f8f5",
+                        "background-dark": "#23220f",
+                        "ink": "#1c1c0d",
+                        "ink-light": "#5A3B3B",
+                    },
+                    fontFamily: {
+                        "display": ["Spline Sans", "sans-serif"],
+                        "serif": ["Libre Baskerville", "serif"],
+                        "sans": ["Spline Sans", "sans-serif"],
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        .smooth-scroll {
+            scroll-behavior: smooth;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.4s ease-out forwards;
+        }
+
+        @keyframes pulse-glow {
+
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(249, 245, 6, 0.3);
+            }
+
+            50% {
+                box-shadow: 0 0 40px rgba(249, 245, 6, 0.5);
+            }
+        }
+
+        .loading-glow {
+            animation: pulse-glow 1.5s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+    </style>
 </head>
 
-<body>
-    <div class="container">
-        <header class="tool-header">
-            <a href="/" class="back-link">← Back to Home</a>
-            <h1 class="tool-title">Ask<span class="gradient-text">TheDocs</span></h1>
-        </header>
-
-        <main class="tool-main">
-            <div class="input-section">
-                <div class="input-group">
-                    <label for="url">Documentation URL</label>
-                    <input type="url" id="url" placeholder="https://example.com/docs/getting-started" required>
-                </div>
-
-                <div class="input-group">
-                    <label for="question">Your Question</label>
-                    <textarea id="question" rows="3" placeholder="How do I install this package?" required></textarea>
-                </div>
-
-                <button id="askButton" class="submit-button">
-                    <span class="button-text">Ask Question</span>
-                    <span class="button-loader" style="display: none;">
-                        <span class="spinner"></span>
-                        Processing...
-                    </span>
+<body
+    class="bg-background-light dark:bg-background-dark text-ink dark:text-background-light font-display antialiased smooth-scroll selection:bg-primary selection:text-ink overflow-x-hidden">
+    <div class="relative flex min-h-screen flex-col">
+        <!-- Header -->
+        <header class="w-full px-6 py-8 md:py-12 flex justify-center">
+            <div class="w-full max-w-[1000px] flex items-center justify-between">
+                <a href="/" class="flex items-center gap-2 group cursor-pointer hover:opacity-80 transition-opacity">
+                    <span class="material-symbols-outlined text-2xl md:text-3xl">youtube_searched_for</span>
+                    <span class="font-bold text-lg tracking-tight">Ask The Docs</span>
+                </a>
+                <nav class="hidden md:flex gap-8 text-sm font-medium text-ink/70">
+                    <a class="hover:text-ink transition-colors" href="#">Documentation</a>
+                    <a class="hover:text-ink transition-colors" href="#">Manifesto</a>
+                    <a class="hover:text-ink transition-colors" href="#">Login</a>
+                </nav>
+                <button class="md:hidden">
+                    <span class="material-symbols-outlined">menu</span>
                 </button>
             </div>
+        </header>
 
-            <div id="responseSection" class="response-section" style="display: none;">
-                <h2 class="response-title">Answer</h2>
-                <div id="responseContent" class="response-content"></div>
-            </div>
+        <!-- Main Content -->
+        <main class="flex-1 w-full px-6 pb-20">
+            <div class="mx-auto max-w-[800px] mt-8 md:mt-16">
+                <!-- Page Title -->
+                <div class="text-center mb-12 md:mb-16">
+                    <div class="flex justify-center mb-6">
+                        <span
+                            class="text-xs font-bold tracking-[0.15em] uppercase text-ink/60 border-b border-ink/20 pb-2">
+                            Query Interface
+                        </span>
+                    </div>
+                    <h1 class="font-serif text-3xl md:text-5xl leading-[1.1] font-normal text-ink mb-4 tracking-tight">
+                        Ask Your Question
+                    </h1>
+                    <p class="text-lg text-ink/70 max-w-[500px] mx-auto font-light">
+                        Provide a documentation URL and your question. Receive intelligent, context-grounded answers.
+                    </p>
+                </div>
 
-            <div id="errorSection" class="error-section" style="display: none;">
-                <div class="error-icon">⚠️</div>
-                <p id="errorMessage"></p>
+                <!-- Input Form Section -->
+                <div
+                    class="bg-ink text-background-light p-8 md:p-10 rounded-lg md:rounded-xl relative overflow-hidden mb-8">
+                    <div
+                        class="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full blur-[80px] -mr-32 -mt-32 pointer-events-none">
+                    </div>
+                    <div class="relative z-10">
+                        <!-- URL Input -->
+                        <div class="mb-6">
+                            <label for="url" class="block text-sm font-medium text-white/80 mb-2">
+                                Documentation URL
+                            </label>
+                            <input type="url" id="url"
+                                class="w-full bg-white/10 border border-white/20 text-white placeholder-white/50 rounded-full px-6 h-12 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                                placeholder="https://example.com/docs/getting-started" required>
+                        </div>
+
+                        <!-- Question Input -->
+                        <div class="mb-6">
+                            <label for="question" class="block text-sm font-medium text-white/80 mb-2">
+                                Your Question
+                            </label>
+                            <textarea id="question" rows="3"
+                                class="w-full bg-white/10 border border-white/20 text-white placeholder-white/50 rounded-lg px-6 py-4 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all resize-none"
+                                placeholder="How do I install this package? What are the main features?"
+                                required></textarea>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button id="askButton"
+                            class="w-full h-12 px-8 rounded-full bg-primary text-ink font-bold text-sm tracking-wide hover:bg-[#e0dd05] transition-all flex items-center justify-center gap-3 disabled:opacity-60 disabled:cursor-not-allowed">
+                            <span class="button-text flex items-center gap-2">
+                                <span class="material-symbols-outlined text-xl">search</span>
+                                Analyze & Answer
+                            </span>
+                            <span class="button-loader hidden items-center gap-2">
+                                <svg class="spinner w-5 h-5" viewBox="0 0 24 24" fill="none">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                        stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor"
+                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                    </path>
+                                </svg>
+                                Processing...
+                            </span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Response Section -->
+                <div id="responseSection" class="hidden fade-in-up">
+                    <div class="border-t border-ink/10 pt-8 mb-8">
+                        <div class="flex items-center gap-3 mb-6">
+                            <span class="material-symbols-outlined text-2xl text-primary">check_circle</span>
+                            <h2 class="font-serif text-2xl text-ink">Answer</h2>
+                        </div>
+                        <div class="bg-white/50 border border-ink/10 rounded-lg p-6 md:p-8">
+                            <div id="responseContent"
+                                class="text-ink/80 leading-relaxed text-base md:text-lg prose max-w-none">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Source Citation -->
+                    <div class="flex items-center gap-2 text-sm text-ink/50">
+                        <span class="material-symbols-outlined text-lg">link</span>
+                        <span>Answer based on content from: </span>
+                        <span id="sourceUrl" class="font-medium text-ink/70 truncate max-w-[300px]"></span>
+                    </div>
+                </div>
+
+                <!-- Error Section -->
+                <div id="errorSection" class="hidden fade-in-up">
+                    <div class="bg-red-50 border border-red-200 rounded-lg p-6 md:p-8 text-center">
+                        <span class="material-symbols-outlined text-4xl text-red-500 mb-3">error</span>
+                        <p id="errorMessage" class="text-red-600 font-medium text-lg"></p>
+                        <p class="text-red-500/70 text-sm mt-2">Please check the URL and try again.</p>
+                    </div>
+                </div>
             </div>
         </main>
+
+        <!-- Footer -->
+        <footer class="w-full px-6 py-8 border-t border-ink/10">
+            <div
+                class="max-w-[800px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-medium text-ink/50 uppercase tracking-wider">
+                <p>© 2024 Research Engine Inc.</p>
+                <div class="flex gap-6">
+                    <a class="hover:text-ink transition-colors" href="#">Privacy</a>
+                    <a class="hover:text-ink transition-colors" href="#">Terms</a>
+                    <a class="hover:text-ink transition-colors" href="#">Contact</a>
+                </div>
+            </div>
+        </footer>
     </div>
 
-    <script src="/js/tool.js"></script>
+    <script>
+        const askButton = document.getElementById('askButton');
+        const urlInput = document.getElementById('url');
+        const questionInput = document.getElementById('question');
+        const responseSection = document.getElementById('responseSection');
+        const responseContent = document.getElementById('responseContent');
+        const sourceUrl = document.getElementById('sourceUrl');
+        const errorSection = document.getElementById('errorSection');
+        const errorMessage = document.getElementById('errorMessage');
+        const buttonText = askButton.querySelector('.button-text');
+        const buttonLoader = askButton.querySelector('.button-loader');
+
+        askButton.addEventListener('click', async () => {
+            const url = urlInput.value.trim();
+            const question = questionInput.value.trim();
+
+            if (!url || !question) {
+                showError('Please provide both a URL and a question.');
+                return;
+            }
+
+            // Reset states
+            responseSection.classList.add('hidden');
+            errorSection.classList.add('hidden');
+
+            // Show loading state
+            askButton.disabled = true;
+            buttonText.classList.add('hidden');
+            buttonLoader.classList.remove('hidden');
+            buttonLoader.classList.add('flex');
+            askButton.classList.add('loading-glow');
+
+            try {
+                const response = await fetch('/api/ask', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ url, question }),
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to get answer');
+                }
+
+                // Show response
+                responseContent.innerHTML = formatResponse(data.answer);
+                sourceUrl.textContent = url;
+                sourceUrl.title = url;
+                responseSection.classList.remove('hidden');
+
+                // Scroll to response
+                responseSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                // Reset button state
+                askButton.disabled = false;
+                buttonText.classList.remove('hidden');
+                buttonLoader.classList.add('hidden');
+                buttonLoader.classList.remove('flex');
+                askButton.classList.remove('loading-glow');
+            }
+        });
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorSection.classList.remove('hidden');
+            errorSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function formatResponse(text) {
+            // Convert markdown-like formatting to HTML
+            return text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/`(.*?)`/g, '<code class="bg-ink/10 px-1.5 py-0.5 rounded text-sm">$1</code>')
+                .replace(/\n\n/g, '</p><p class="mt-4">')
+                .replace(/\n/g, '<br>')
+                .replace(/^/, '<p>')
+                .replace(/$/, '</p>');
+        }
+
+        // Allow Enter key to submit (Shift+Enter for new line in textarea)
+        questionInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                askButton.click();
+            }
+        });
+    </script>
 </body>
 
 </html>

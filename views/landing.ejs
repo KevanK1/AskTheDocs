@@ -1,79 +1,259 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="light" lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AskTheDocs - Ask questions about documentation</title>
-  <link rel="stylesheet" href="/css/style.css">
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Research Engine - AI Web Scraping</title>
+  <link href="https://fonts.googleapis.com" rel="preconnect" />
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Spline+Sans:wght@300..700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#f9f506",
+            "background-light": "#f8f8f5",
+            "background-dark": "#23220f",
+            "ink": "#1c1c0d",
+            "ink-light": "#5A3B3B",
+          },
+          fontFamily: {
+            "display": ["Spline Sans", "sans-serif"],
+            "serif": ["Libre Baskerville", "serif"],
+            "sans": ["Spline Sans", "sans-serif"],
+          },
+          borderRadius: {
+            "DEFAULT": "1rem",
+            "lg": "2rem",
+            "xl": "3rem",
+            "full": "9999px"
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    .print-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+    }
+
+    @media (min-width: 768px) {
+      .print-grid {
+        grid-template-columns: 80px 1fr;
+      }
+    }
+
+    .smooth-scroll {
+      scroll-behavior: smooth;
+    }
+  </style>
 </head>
-<body>
-  <div class="container">
-    <header class="hero">
-      <div class="hero-badge">Developer Tool</div>
-      <h1 class="hero-title">
-        Ask<span class="gradient-text">TheDocs</span>
-      </h1>
-      <p class="hero-subtitle">
-        Ask questions about documentation without copy-pasting
-      </p>
-      <p class="hero-description">
-        Paste any documentation URL, ask your question, and get instant AI-powered answers
-        extracted directly from the content.
-      </p>
-      <a href="/tool" class="cta-button">
-        Try It Now
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-          <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </a>
+
+<body
+  class="bg-background-light dark:bg-background-dark text-ink dark:text-background-light font-display antialiased smooth-scroll selection:bg-primary selection:text-ink overflow-x-hidden">
+  <div class="relative flex min-h-screen flex-col">
+    <!-- Header -->
+    <header class="w-full px-6 py-8 md:py-12 flex justify-center">
+      <div class="w-full max-w-[1000px] flex items-center justify-between">
+        <div class="flex items-center gap-2 group cursor-pointer">
+          <span class="material-symbols-outlined text-2xl md:text-3xl">youtube_searched_for</span>
+          <span class="font-bold text-lg tracking-tight">Ask The Docs</span>
+        </div>
+        <nav class="hidden md:flex gap-8 text-sm font-medium text-ink/70">
+          <a class="hover:text-ink transition-colors" href="#">Documentation</a>
+          <a class="hover:text-ink transition-colors" href="#">Manifesto</a>
+          <a class="hover:text-ink transition-colors" href="#">Login</a>
+        </nav>
+        <button class="md:hidden">
+          <span class="material-symbols-outlined">menu</span>
+        </button>
+      </div>
     </header>
 
-    <section class="features">
-      <h2 class="features-title">How It Works</h2>
-      <div class="feature-grid">
-        <div class="feature-card">
-          <div class="feature-icon">🔗</div>
-          <h3>Paste URL</h3>
-          <p>Provide any documentation or blog URL</p>
+    <!-- Main Content -->
+    <main class="flex-1 w-full px-6 pb-20">
+      <!-- Hero Section -->
+      <div class="mx-auto max-w-[1000px] mt-12 md:mt-24 mb-32 md:mb-48 flex flex-col md:flex-row items-center gap-12">
+        <div class="flex-1 max-w-[640px]">
+          <div class="flex mb-8 md:mb-10">
+            <span class="text-xs font-bold tracking-[0.15em] uppercase text-ink/60 border-b border-ink/20 pb-2">
+              Intelligent Parsing Engine v1.0
+            </span>
+          </div>
+          <h1
+            class="font-serif text-4xl md:text-6xl lg:text-[64px] leading-[1.1] font-normal text-ink mb-8 md:mb-10 tracking-tight">
+            Transforming<br />information access.
+          </h1>
+          <p class="text-lg md:text-xl leading-relaxed text-ink/80 max-w-[640px] mb-12 font-light">
+            Paste any documentation or blog URL. Ask complex questions.
+            Receive context-grounded answers instantly, powered by a semantic
+            understanding engine that reads like a human researcher.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+            <a href="/tool"
+              class="h-12 px-8 rounded-full bg-primary text-ink font-bold text-sm tracking-wide hover:bg-[#e0dd05] transition-colors flex items-center justify-center min-w-[140px]">
+              Let's Start
+            </a>
+            <a class="h-12 px-8 rounded-full border border-ink/20 text-ink font-medium text-sm tracking-wide hover:bg-ink/5 transition-colors flex items-center justify-center min-w-[140px]"
+              href="#how-it-works">
+              How it works
+            </a>
+          </div>
         </div>
-        <div class="feature-card">
-          <div class="feature-icon">❓</div>
-          <h3>Ask Question</h3>
-          <p>Type your question about the content</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">🤖</div>
-          <h3>Get Answer</h3>
-          <p>AI extracts and answers from the documentation</p>
+
+        <!-- Hero Illustration -->
+        <div class="hidden md:flex flex-1 justify-center items-center relative w-full h-[400px]">
+          <div class="relative w-[380px] h-[380px]">
+            <svg class="w-full h-full text-ink drop-shadow-sm" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+              <path d="M50,200 Q150,50 350,200" fill="none" stroke="currentColor" stroke-dasharray="6 6"
+                stroke-opacity="0.1" stroke-width="1.5"></path>
+              <path d="M50,200 Q150,350 350,200" fill="none" stroke="currentColor" stroke-dasharray="6 6"
+                stroke-opacity="0.1" stroke-width="1.5"></path>
+              <path d="M60,280 C100,280 80,120 160,120 S240,280 340,160" fill="none" stroke="currentColor"
+                stroke-linecap="round" stroke-width="2"></path>
+              <path d="M80,140 C120,140 140,260 220,260 S300,100 320,120" fill="none" stroke="currentColor"
+                stroke-linecap="round" stroke-opacity="0.4" stroke-width="1.5"></path>
+              <g class="fill-background-light stroke-ink" stroke-width="2">
+                <circle cx="60" cy="280" r="6"></circle>
+                <circle cx="160" cy="120" r="6"></circle>
+                <circle cx="340" cy="160" r="6"></circle>
+                <circle cx="80" cy="140" r="4" stroke-opacity="0.6"></circle>
+                <circle cx="220" cy="260" r="4" stroke-opacity="0.6"></circle>
+              </g>
+              <circle cx="160" cy="120" fill="none" r="16" stroke="#f9f506" stroke-opacity="0.8" stroke-width="2">
+              </circle>
+              <circle cx="160" cy="120" fill="none" r="30" stroke="#f9f506" stroke-dasharray="4 4" stroke-opacity="0.3"
+                stroke-width="1"></circle>
+              <circle cx="110" cy="200" fill="currentColor" fill-opacity="0.3" r="2"></circle>
+              <circle cx="200" cy="190" fill="currentColor" fill-opacity="0.3" r="2"></circle>
+              <circle cx="280" cy="210" fill="currentColor" fill-opacity="0.3" r="2"></circle>
+            </svg>
+          </div>
         </div>
       </div>
-    </section>
 
-    <section class="benefits">
-      <h2 class="benefits-title">Why AskTheDocs?</h2>
-      <ul class="benefits-list">
-        <li>
-          <span class="check-icon">✓</span>
-          <strong>No Manual Searching:</strong> Stop scrolling through long documentation pages
-        </li>
-        <li>
-          <span class="check-icon">✓</span>
-          <strong>Instant Answers:</strong> Get precise answers in seconds
-        </li>
-        <li>
-          <span class="check-icon">✓</span>
-          <strong>Context-Aware:</strong> AI answers strictly from the provided documentation
-        </li>
-        <li>
-          <span class="check-icon">✓</span>
-          <strong>Developer-Friendly:</strong> Built for technical content and documentation
-        </li>
-      </ul>
-    </section>
+      <!-- How It Works Section -->
+      <div class="mx-auto max-w-[800px] border-t border-ink/10 pt-16 md:pt-24" id="how-it-works">
+        <div class="mb-16">
+          <h2 class="font-serif text-2xl md:text-3xl text-ink">System Logic</h2>
+        </div>
 
-    <footer class="footer">
-      <p>Built with Node.js, Express, and AI</p>
+        <div class="flex flex-col gap-12 md:gap-16">
+          <!-- Step 01 -->
+          <div class="print-grid gap-6 md:gap-12 group">
+            <div
+              class="text-ink/30 font-serif text-4xl md:text-5xl leading-none group-hover:text-primary transition-colors duration-500 select-none">
+              01
+            </div>
+            <div class="flex flex-col pt-2">
+              <h3 class="text-lg font-bold text-ink mb-2">Ingestion</h3>
+              <p class="text-ink/70 leading-relaxed text-base md:text-lg">
+                Paste the URL source of any technical documentation, blog post, or article. The engine validates the
+                accessibility of the content.
+              </p>
+            </div>
+          </div>
+
+          <!-- Step 02 -->
+          <div class="print-grid gap-6 md:gap-12 group">
+            <div
+              class="text-ink/30 font-serif text-4xl md:text-5xl leading-none group-hover:text-primary transition-colors duration-500 select-none">
+              02
+            </div>
+            <div class="flex flex-col pt-2">
+              <h3 class="text-lg font-bold text-ink mb-2">Query Formulation</h3>
+              <p class="text-ink/70 leading-relaxed text-base md:text-lg">
+                Ask natural language questions about the content. From specific implementation details to broad
+                summaries.
+              </p>
+            </div>
+          </div>
+
+          <!-- Step 03 -->
+          <div class="print-grid gap-6 md:gap-12 group">
+            <div
+              class="text-ink/30 font-serif text-4xl md:text-5xl leading-none group-hover:text-primary transition-colors duration-500 select-none">
+              03
+            </div>
+            <div class="flex flex-col pt-2">
+              <h3 class="text-lg font-bold text-ink mb-2">Semantic Parsing</h3>
+              <p class="text-ink/70 leading-relaxed text-base md:text-lg">
+                The AI breaks down the document structure, identifies context, and isolates relevant vector embeddings
+                matching your intent.
+              </p>
+            </div>
+          </div>
+
+          <!-- Step 04 -->
+          <div class="print-grid gap-6 md:gap-12 group">
+            <div
+              class="text-ink/30 font-serif text-4xl md:text-5xl leading-none group-hover:text-primary transition-colors duration-500 select-none">
+              04
+            </div>
+            <div class="flex flex-col pt-2">
+              <h3 class="text-lg font-bold text-ink mb-2">Synthesis</h3>
+              <p class="text-ink/70 leading-relaxed text-base md:text-lg">
+                Receive a direct, cited answer. No hallucinations, just facts grounded strictly in the source material
+                provided.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CTA Section -->
+      <div class="mx-auto max-w-[800px] mt-32 md:mt-48 mb-20">
+        <div class="bg-ink text-background-light p-8 md:p-12 rounded-lg md:rounded-xl relative overflow-hidden">
+          <div
+            class="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full blur-[80px] -mr-32 -mt-32 pointer-events-none">
+          </div>
+          <div class="relative z-10">
+            <h2 class="font-serif text-2xl md:text-3xl mb-6">Ready to accelerate your research?</h2>
+            <div class="flex flex-col sm:flex-row gap-4">
+              <input id="heroUrl"
+                class="flex-1 bg-white/10 border border-white/20 text-white placeholder-white/50 rounded-full px-6 h-12 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                placeholder="Paste a URL here..." type="text" />
+              <a href="/tool" id="analyzeBtn"
+                class="h-12 px-8 rounded-full bg-primary text-ink font-bold text-sm tracking-wide hover:bg-[#e0dd05] transition-colors whitespace-nowrap flex items-center justify-center">
+                Analyze
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full px-6 py-8 border-t border-ink/10">
+      <div
+        class="max-w-[800px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-medium text-ink/50 uppercase tracking-wider">
+        <p>© 2024 Research Engine Inc.</p>
+        <div class="flex gap-6">
+          <a class="hover:text-ink transition-colors" href="#">Privacy</a>
+          <a class="hover:text-ink transition-colors" href="#">Terms</a>
+          <a class="hover:text-ink transition-colors" href="#">Contact</a>
+        </div>
+      </div>
     </footer>
   </div>
+
+  <script>
+    // Optional: Pass URL to tool page
+    document.getElementById('analyzeBtn').addEventListener('click', (e) => {
+      const url = document.getElementById('heroUrl').value.trim();
+      if (url) {
+        e.preventDefault();
+        window.location.href = `/tool?url=${encodeURIComponent(url)}`;
+      }
+    });
+  </script>
 </body>
+
 </html>

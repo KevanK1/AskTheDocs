@@ -3,14 +3,11 @@ require('dotenv').config();
 
 function buildPrompt(extractedText, question) {
     return `You are given text extracted from a documentation or informational website.
-
 Answer the user's question using ONLY this content.
 If the answer is not present, clearly say so.
 Keep the answer short and beginner-friendly.
-
 Website Content:
 ${extractedText}
-
 User Question:
 ${question}`;
 }
@@ -22,7 +19,6 @@ async function askQuestion(extractedText, question) {
     if (!apiKey) {
         throw new Error('AI API key not configured');
     }
-
     if (!apiUrl) {
         throw new Error('AI API URL not configured');
     }
@@ -51,7 +47,6 @@ async function askQuestion(extractedText, question) {
             }
         );
 
-        // Extract the answer from Gemini's response
         if (
             response.data.candidates &&
             response.data.candidates.length > 0 &&
