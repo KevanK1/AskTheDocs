@@ -1,8 +1,9 @@
-<img width="1900" height="874" alt="image" src="https://github.com/user-attachments/assets/e7db89c4-7bb9-4e18-8e9c-9e62cf208cf1" /># AskTheDocs
 
 > Ask questions about documentation without copy-pasting
-> Live link : askthedocs-kevan.up.railway.app
+
 A backend-focused mini project that allows users to paste a documentation/blog/info-site URL and ask questions about it using AI.
+
+> Live link : askthedocs-kevan.up.railway.app
 
 ## 🎯 Project Overview
 
@@ -12,6 +13,9 @@ AskTheDocs is a clean, minimal backend project built to demonstrate:
 - AI API integration
 - Clean code architecture
 - Error handling best practices
+
+<img width="1900" height="874" alt="image" src="https://github.com/user-attachments/assets/ced8117a-7629-4855-ac0d-b8f5a34a073a" />
+
 
 **Perfect for coding interviews and portfolio projects.**
 
