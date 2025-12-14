@@ -1,7 +1,7 @@
-# AskTheDocs
+<img width="1900" height="874" alt="image" src="https://github.com/user-attachments/assets/e7db89c4-7bb9-4e18-8e9c-9e62cf208cf1" /># AskTheDocs
 
 > Ask questions about documentation without copy-pasting
-
+> Live link : askthedocs-kevan.up.railway.app
 A backend-focused mini project that allows users to paste a documentation/blog/info-site URL and ask questions about it using AI.
 
 ## 🎯 Project Overview
