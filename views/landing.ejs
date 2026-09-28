@@ -61,21 +61,31 @@
   <div class="relative flex min-h-screen flex-col">
     <!-- Header -->
     <header class="w-full px-6 py-4 md:py-6 flex justify-center">
-      <div class="w-full max-w-[1000px] flex items-center justify-between">
-        <div class="flex items-center gap-2 group cursor-pointer">
-          <span class="material-symbols-outlined text-2xl md:text-3xl">youtube_searched_for</span>
-          <span class="font-bold text-lg tracking-tight">Ask The Docs</span>
-        </div>
-        <nav class="hidden md:flex gap-8 text-sm font-medium text-ink/70">
-          <a class="hover:text-ink transition-colors" href="#">Documentation</a>
-          <a class="hover:text-ink transition-colors" href="#">Manifesto</a>
-          <a class="hover:text-ink transition-colors" href="#">Login</a>
-        </nav>
-        <button class="md:hidden">
-          <span class="material-symbols-outlined">menu</span>
-        </button>
-      </div>
-    </header>
+  <div class="w-full max-w-[1000px] flex items-center justify-between">
+    <div class="flex items-center gap-2 group cursor-pointer">
+      <span class="material-symbols-outlined text-2xl md:text-3xl">youtube_searched_for</span>
+      <span class="font-bold text-lg tracking-tight">Ask The Docs</span>
+    </div>
+    
+    <nav class="hidden md:flex gap-8 text-sm font-medium text-ink/70 items-center">
+      <a class="hover:text-ink transition-colors" href="#">Documentation</a>
+      <% if (user) { %>
+        <span class="text-ink/50 border-r border-ink/20 pr-4 text-xs">
+          Active: <strong><%= user.email %></strong>
+        </span>
+        <a class="hover:text-red-600 font-bold transition-colors text-xs uppercase tracking-wider" href="/auth/logout">Logout</a>
+      <% } else { %>
+        <a class="hover:text-ink transition-colors" href="#cta-login">Manifesto</a>
+        <a class="hover:text-ink transition-colors font-bold text-primary bg-ink px-4 py-1.5 rounded-full" href="#cta-login">Login</a>
+      <% } %>
+    </nav>
+
+    <button class="md:hidden">
+      <span class="material-symbols-outlined">menu</span>
+    </button>
+  </div>
+</header>
+
 
     <!-- Main Content -->
     <main class="flex-1 w-full px-6 pb-8">
