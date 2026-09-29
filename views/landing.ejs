@@ -344,74 +344,73 @@
     </footer>
   </div>
 
-  <script>
-  const loginModal = document.getElementById('cta-login');
-  const loginLink = document.getElementById('loginLink');
-  const mobileLoginLink = document.getElementById('mobileLoginLink');
-  const closeLogin = document.getElementById('closeLogin');
+<script>
+  // Wrap your layout queries inside a load listener to ensure elements exist!
+  window.addEventListener('DOMContentLoaded', () => {
+    const loginModal = document.getElementById('cta-login');
+    const loginLink = document.getElementById('loginLink');
+    const mobileLoginLink = document.getElementById('mobileLoginLink');
+    const closeLogin = document.getElementById('closeLogin');
 
-  const openLogin = (event) => {
-    event.preventDefault();
-    if (loginModal) loginModal.classList.remove('hidden');
-  };
-
-  loginLink?.addEventListener('click', openLogin);
-  mobileLoginLink?.addEventListener('click', openLogin);
-
-  closeLogin?.addEventListener('click', () => loginModal?.classList.add('hidden'));
-  loginModal?.addEventListener('click', (event) => {
-    if (event.target === loginModal) loginModal.classList.add('hidden');
-  });
-
-  // Forward landing context variables straight down into the workspace dashboard
-  document.getElementById('analyzeBtn')?.addEventListener('click', (event) => {
-    const url = document.getElementById('heroUrl').value.trim();
-    if (url) {
+    const openLogin = (event) => {
       event.preventDefault();
-      window.location.href = `/tool?url=${encodeURIComponent(url)}`;
-    } else {
-      window.location.href = '/tool';
-    }
-  });
+      if (loginModal) loginModal.classList.remove('hidden');
+    };
 
-  // Automatic link interceptor for Supabase email-link redirects
-  window.addEventListener('DOMContentLoaded', async () => {
-    const hash = window.location.hash;
+    // Attach event listeners safely
+    loginLink?.addEventListener('click', openLogin);
+    mobileLoginLink?.addEventListener('click', openLogin);
+
+    closeLogin?.addEventListener('click', () => loginModal?.classList.add('hidden'));
     
-    // ✅ FIX: If there is no hash or it doesn't contain an access token, stop here!
-    if (!hash || !hash.includes('access_token')) return;
+    loginModal?.addEventListener('click', (event) => {
+      if (event.target === loginModal) loginModal.classList.add('hidden');
+    });
 
-    const params = new URLSearchParams(hash.replace('#', '?'));
-    const accessToken = params.get('access_token');
-
-    if (accessToken) {
-      if (loginModal) {
-        loginModal.classList.remove('hidden');
-        const titleEl = document.getElementById('loginTitle');
-        if (titleEl) titleEl.innerText = 'Authenticating link...';
+    // Handle document parsing trigger button
+    document.getElementById('analyzeBtn')?.addEventListener('click', (event) => {
+      const url = document.getElementById('heroUrl').value.trim();
+      if (url) {
+        event.preventDefault();
+        window.location.href = `/tool?url=${encodeURIComponent(url)}`;
+      } else {
+        window.location.href = '/tool';
       }
+    });
 
-      try {
-        const response = await fetch('/auth/verify-otp', {
+    // Automatic link interceptor for Supabase email-link redirects
+    const hash = window.location.hash;
+    if (hash && hash.includes('access_token')) {
+      const params = new URLSearchParams(hash.replace('#', '?'));
+      const accessToken = params.get('access_token');
+
+      if (accessToken) {
+        if (loginModal) {
+          loginModal.classList.remove('hidden');
+          const titleEl = document.getElementById('loginTitle');
+          if (titleEl) titleEl.innerText = 'Authenticating link...';
+        }
+
+        fetch('/auth/verify-otp', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ isLinkRedirect: true, token: accessToken })
-        });
-
-        if (response.ok) {
-          window.location.href = '/tool';
-        } else {
-          const errData = await response.json();
-          alert(errData.error || 'Authentication link failed or expired.');
-          window.location.hash = ''; // Clear hash context on error
-        }
-      } catch (error) {
-        console.error('Link login processing failed:', error);
+        })
+        .then(response => {
+          if (response.ok) {
+            window.location.href = '/tool';
+          } else {
+            return response.json().then(errData => {
+              alert(errData.error || 'Authentication link failed or expired.');
+              window.location.hash = '';
+            });
+          }
+        })
+        .catch(error => console.error('Link login processing failed:', error));
       }
     }
   });
 </script>
-
 
 </body>
 
