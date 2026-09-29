@@ -76,11 +76,12 @@
         <a class="hover:text-red-600 font-bold transition-colors text-xs uppercase tracking-wider" href="/auth/logout">Logout</a>
       <% } else { %>
         <a class="hover:text-ink transition-colors" href="#cta-login">Manifesto</a>
-        <a class="hover:text-ink transition-colors font-bold text-primary bg-ink px-4 py-1.5 rounded-full" href="#cta-login">Login</a>
+        <a class="hover:text-ink transition-colors font-bold text-primary bg-ink px-4 py-1.5 rounded-full" href="#cta-login" id="loginLink">Login</a>
       <% } %>
     </nav>
 
-    <button class="md:hidden">
+    <a class="md:hidden text-sm font-bold text-primary bg-ink px-4 py-2 rounded-full" href="#cta-login" id="mobileLoginLink">Login</a>
+    <button class="md:hidden" aria-label="Open navigation menu">
       <span class="material-symbols-outlined">menu</span>
     </button>
   </div>
@@ -240,6 +241,43 @@
       </div>
     </main>
 
+    <!-- Login modal -->
+    <div id="cta-login" class="<%= locals.message || locals.step === 'verify' ? '' : 'hidden' %> fixed inset-0 z-50 flex items-center justify-center bg-ink/50 px-6" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+      <div class="w-full max-w-md rounded-lg bg-background-light p-8 shadow-2xl">
+        <div class="mb-6 flex items-start justify-between gap-4">
+          <div>
+            <p class="mb-2 text-xs font-bold uppercase tracking-[0.15em] text-ink/60">Secure access</p>
+            <h2 id="loginTitle" class="font-serif text-2xl text-ink"><%= locals.step === 'verify' ? 'Enter your code' : 'Log in with email' %></h2>
+          </div>
+          <button type="button" id="closeLogin" class="text-2xl leading-none text-ink/50 hover:text-ink" aria-label="Close login">&times;</button>
+        </div>
+
+        <% if (locals.message) { %>
+          <p class="mb-5 rounded-lg border border-ink/10 bg-primary/30 px-4 py-3 text-sm text-ink"><%= message %></p>
+        <% } %>
+
+        <% if (locals.step === 'verify') { %>
+          <form method="post" action="/auth/verify-otp" class="space-y-4">
+            <input type="hidden" name="email" value="<%= email %>" />
+            <label class="block text-sm font-medium text-ink" for="otpToken">Verification code</label>
+            <input id="otpToken" name="otpToken" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required
+              class="h-12 w-full rounded-full border border-ink/20 bg-white px-5 text-center text-lg tracking-[0.3em] text-ink outline-none focus:ring-2 focus:ring-primary"
+              placeholder="123456" />
+            <button type="submit" class="h-12 w-full rounded-full bg-primary font-bold text-ink hover:bg-[#e0dd05]">Verify and continue</button>
+          </form>
+          <p class="mt-4 text-center text-xs text-ink/60">Code sent to <strong><%= email %></strong></p>
+        <% } else { %>
+          <form method="post" action="/auth/send-otp" class="space-y-4">
+            <label class="block text-sm font-medium text-ink" for="loginEmail">Email address</label>
+            <input id="loginEmail" name="email" type="email" autocomplete="email" required
+              class="h-12 w-full rounded-full border border-ink/20 bg-white px-5 text-ink outline-none focus:ring-2 focus:ring-primary"
+              placeholder="you@example.com" />
+            <button type="submit" class="h-12 w-full rounded-full bg-primary font-bold text-ink hover:bg-[#e0dd05]">Send verification code</button>
+          </form>
+        <% } %>
+      </div>
+    </div>
+
     <!-- Footer -->
     <footer class="w-full px-6 py-8 border-t border-ink/10">
       <div
@@ -255,6 +293,24 @@
   </div>
 
   <script>
+    const loginModal = document.getElementById('cta-login');
+    const loginLink = document.getElementById('loginLink');
+    const mobileLoginLink = document.getElementById('mobileLoginLink');
+    const closeLogin = document.getElementById('closeLogin');
+
+    const openLogin = (event) => {
+      event.preventDefault();
+      loginModal.classList.remove('hidden');
+    };
+
+    loginLink?.addEventListener('click', openLogin);
+    mobileLoginLink?.addEventListener('click', openLogin);
+
+    closeLogin?.addEventListener('click', () => loginModal.classList.add('hidden'));
+    loginModal?.addEventListener('click', (event) => {
+      if (event.target === loginModal) loginModal.classList.add('hidden');
+    });
+
     // Optional: Pass URL to tool page
     document.getElementById('analyzeBtn').addEventListener('click', (e) => {
       const url = document.getElementById('heroUrl').value.trim();

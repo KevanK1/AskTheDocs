@@ -36,23 +36,32 @@ app.get('/', (req, res) => {
 
 // 2. Submit user email to trigger the 6-digit OTP delivery
 app.post('/auth/send-otp', async (req, res) => {
-  const { email } = req.body;
+  const email = req.body.email?.trim().toLowerCase();
+  if (!email) {
+    return res.render('landing', { user: null, message: 'Please enter a valid email address.', step: null });
+  }
+
   const { error } = await supabase.auth.signInWithOtp({ email });
   
   if (error) {
-    return res.render('landing', { message: error.message, step: null });
+    return res.render('landing', { user: null, message: error.message, step: null });
   }
   
-  res.render('landing', { step: 'verify', email: email, message: 'OTP Token dispatched to your inbox!' });
+  res.render('landing', { user: null, step: 'verify', email, message: 'A verification code was sent to your inbox.' });
 });
 
 // 3. Confirm target authentication token check input payload
 app.post('/auth/verify-otp', async (req, res) => {
-  const { email, otpToken } = req.body;
+  const email = req.body.email?.trim().toLowerCase();
+  const otpToken = req.body.otpToken?.trim();
+  if (!email || !otpToken) {
+    return res.render('landing', { user: null, message: 'Enter the verification code from your email.', step: 'verify', email });
+  }
+
   const { data, error } = await supabase.auth.verifyOtp({ email, token: otpToken, type: 'email' });
   
   if (error || !data.session) {
-    return res.render('landing', { message: 'Invalid or expired OTP token confirmation failure.', step: null });
+    return res.render('landing', { user: null, message: 'Invalid or expired verification code.', step: 'verify', email });
   }
   
   // Query tracking metrics row details from database table
@@ -77,7 +86,7 @@ app.use('/api', askRoutes);
 app.use((req, res) => {
   res.status(404).json({ error: 'Endpoint not found' });
 });
-
+// 
 app.use((err, req, res, next) => {
   console.error('Server error:', err);
   res.status(500).json({
