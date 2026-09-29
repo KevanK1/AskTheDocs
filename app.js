@@ -56,39 +56,68 @@ app.post('/auth/send-otp', async (req, res) => {
   res.render('landing', { user: null, step: 'verify', email, message: 'A 6-digit verification code was sent to your inbox.' });
 });
 
-// 3. Confirm target authentication token check input payload
+// 3. Confirm authentication access token payload for code or email-link logins
 app.post('/auth/verify-otp', async (req, res) => {
+  const isLinkRedirect = req.body.isLinkRedirect === true || req.body.isLinkRedirect === 'true';
+  const token = req.body.token?.trim();
   const email = req.body.email?.trim().toLowerCase();
   const otpToken = req.body.otpToken?.trim();
-  if (!email || !otpToken) {
-    return res.render('landing', { user: null, message: 'Enter the verification code from your email.', step: 'verify', email });
+
+  let sessionToken = token;
+  let activeUser = null;
+
+  try {
+    if (isLinkRedirect) {
+      if (!sessionToken) {
+        return res.status(401).json({ error: 'Link session token is required.' });
+      }
+
+      const { data: { user }, error } = await supabase.auth.getUser(sessionToken);
+      if (error || !user) {
+        return res.status(401).json({ error: 'Link expired or invalid session state.' });
+      }
+      activeUser = user;
+    } else {
+      if (!email || !otpToken) {
+        return res.render('landing', { user: null, message: 'Enter the validation code.', step: 'verify', email });
+      }
+
+      const { data, error } = await supabase.auth.verifyOtp({ email, token: otpToken, type: 'email' });
+      if (error || !data.session) {
+        return res.render('landing', { user: null, message: error?.message || 'Invalid passcode.', step: 'verify', email });
+      }
+      activeUser = data.user;
+      sessionToken = data.session.access_token;
+    }
+
+    const { data: usage } = await supabase
+      .from('user_usage')
+      .select('prompt_count')
+      .eq('user_id', activeUser.id)
+      .single();
+    const usageCount = usage ? usage.prompt_count : 0;
+
+    if (isLinkRedirect) {
+      app.locals.activeSession = { user: activeUser, token: sessionToken, usageCount };
+      return res.status(200).json({ status: 'success' });
+    }
+
+    return res.render('tool', { user: activeUser, token: sessionToken, usageCount });
+  } catch (err) {
+    console.error('Server error during code processing:', err);
+    return isLinkRedirect
+      ? res.status(500).json({ error: 'Backend connection processing failure.' })
+      : res.render('landing', { user: null, message: 'System processing error context.', step: null });
   }
-
-  // 🛡️ FIX: Standardize type parameter checking sequence for pure text numbers verification
-  const { data, error } = await supabase.auth.verifyOtp({ 
-    email, 
-    token: otpToken, 
-    type: 'email' // Standardized to natively check both signups and magiclink OTP text tokens
-  });
-  
-  if (error || !data.session) {
-    return res.render('landing', { user: null, message: error?.message || 'Invalid or expired verification code.', step: 'verify', email });
-  }
-
-  // Query tracking metrics row details from database table
-  let { data: usage } = await supabase.from('user_usage').select('prompt_count').eq('user_id', data.user.id).single();
-  let usageCount = usage ? usage.prompt_count : 0;
-
-  // Pass user authorization context payload down cleanly straight into the tool view workspace dashboard
-  res.render('tool', { 
-    user: data.user, 
-    token: data.session.access_token, 
-    usageCount: usageCount 
-  });
 });
 
-// Block direct unauthenticated access to the workspace page
+// Clean workspace gate for link-based logins
 app.get('/tool', (req, res) => {
+  if (app.locals.activeSession) {
+    const { user, token, usageCount } = app.locals.activeSession;
+    app.locals.activeSession = null;
+    return res.render('tool', { user, token, usageCount });
+  }
   res.redirect('/');
 });
 

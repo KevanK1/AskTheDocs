@@ -334,7 +334,7 @@
     <footer class="w-full px-6 py-8 border-t border-ink/10">
       <div
         class="max-w-[800px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-medium text-ink/50 uppercase tracking-wider">
-        <p>© 2024 Research Engine Inc.</p>
+        <p>© 2026 Research Engine Inc.</p>
         <div class="flex gap-6">
           <a class="hover:text-ink transition-colors" href="#">Privacy</a>
           <a class="hover:text-ink transition-colors" href="#">Terms</a>
@@ -371,6 +371,40 @@
         window.location.href = `/tool?url=${encodeURIComponent(url)}`;
       } else {
         window.location.href = '/tool';
+      }
+    });
+
+    // Automatic link interceptor for Supabase email-link redirects
+    window.addEventListener('DOMContentLoaded', async () => {
+      const hash = window.location.hash;
+      if (!hash) return;
+
+      const params = new URLSearchParams(hash.replace('#', '?'));
+      const accessToken = params.get('access_token');
+
+      if (accessToken) {
+        if (loginModal) {
+          loginModal.classList.remove('hidden');
+          const titleEl = document.getElementById('loginTitle');
+          if (titleEl) titleEl.innerText = 'Authenticating link...';
+        }
+
+        try {
+          const response = await fetch('/auth/verify-otp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ isLinkRedirect: true, token: accessToken })
+          });
+
+          if (response.ok) {
+            window.location.href = '/tool';
+          } else {
+            const errData = await response.json();
+            alert(errData.error || 'Authentication link failed or expired.');
+          }
+        } catch (error) {
+          console.error('Link login processing failed:', error);
+        }
       }
     });
   </script>
