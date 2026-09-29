@@ -343,7 +343,8 @@
       </div>
     </footer>
   </div>
-<script>
+
+  <script>
   const loginModal = document.getElementById('cta-login');
   const loginLink = document.getElementById('loginLink');
   const mobileLoginLink = document.getElementById('mobileLoginLink');
@@ -376,6 +377,8 @@
   // Automatic link interceptor for Supabase email-link redirects
   window.addEventListener('DOMContentLoaded', async () => {
     const hash = window.location.hash;
+    
+    // ✅ FIX: If there is no hash or it doesn't contain an access token, stop here!
     if (!hash || !hash.includes('access_token')) return;
 
     const params = new URLSearchParams(hash.replace('#', '?'));
@@ -400,7 +403,7 @@
         } else {
           const errData = await response.json();
           alert(errData.error || 'Authentication link failed or expired.');
-          window.location.hash = '';
+          window.location.hash = ''; // Clear hash context on error
         }
       } catch (error) {
         console.error('Link login processing failed:', error);
@@ -408,6 +411,7 @@
     }
   });
 </script>
+
 
 </body>
 
