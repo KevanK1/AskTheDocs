@@ -362,3 +362,18 @@
     loginModal?.addEventListener('click', (event) => {
       if (event.target === loginModal) loginModal.classList.add('hidden');
     });
+
+    // Forward landing context variables straight down into the workspace dashboard
+    document.getElementById('analyzeBtn')?.addEventListener('click', (event) => {
+      const url = document.getElementById('heroUrl').value.trim();
+      if (url) {
+        event.preventDefault();
+        window.location.href = `/tool?url=${encodeURIComponent(url)}`;
+      } else {
+        window.location.href = '/tool';
+      }
+    });
+  </script>
+</body>
+
+</html>
