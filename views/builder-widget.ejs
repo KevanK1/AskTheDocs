@@ -70,34 +70,48 @@
 
   .builder-bubble i,
   .builder-bubble-text {
-    flex: 0 0 auto;
+    position: absolute;
     transition: opacity 270ms ease;
+  }
+
+  .builder-bubble i {
+    opacity: 1;
+    visibility: visible;
   }
 
   .builder-bubble-text {
     opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
     white-space: nowrap;
     font-size: 0.75rem;
     font-weight: 700;
     letter-spacing: 0.03em;
+    transition: opacity 270ms ease, visibility 0s linear 270ms;
   }
 
   .builder-widget:hover .builder-bubble i,
   .builder-widget:focus-within .builder-bubble i {
     opacity: 0;
+    visibility: hidden;
   }
 
   .builder-widget:hover .builder-bubble-text,
   .builder-widget:focus-within .builder-bubble-text {
     opacity: 1;
+    visibility: visible;
+    transition: opacity 270ms ease;
   }
 
   .builder-widget.is-dragging .builder-bubble i {
     opacity: 1;
+    visibility: visible;
   }
 
   .builder-widget.is-dragging .builder-bubble-text {
+    transition: opacity 270ms ease;
     opacity: 0;
+    visibility: hidden;
   }
 
   .builder-widget:not(.is-left) .builder-bubble {
@@ -183,6 +197,18 @@
     .builder-widget:hover .builder-bubble,
     .builder-widget:focus-within .builder-bubble {
       width: 100%;
+    }
+
+    .builder-widget:hover .builder-bubble i,
+    .builder-widget:focus-within .builder-bubble i {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .builder-widget:hover .builder-bubble-text,
+    .builder-widget:focus-within .builder-bubble-text {
+      opacity: 0;
+      visibility: hidden;
     }
   }
 </style>
