@@ -16,6 +16,9 @@
   }
 
   .builder-bubble {
+    position: absolute;
+    top: 0;
+    right: 0;
     width: 100%;
     height: 100%;
     border: 1px solid #1c1c0d;
@@ -25,13 +28,27 @@
     box-shadow: 0 6px 18px rgba(28, 28, 13, 0.18);
     backdrop-filter: blur(10px);
     cursor: grab;
-    display: grid;
-    place-items: center;
-    transition: background 180ms ease, border-radius 180ms ease, box-shadow 180ms ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    overflow: hidden;
+    transition: width 280ms ease, background 180ms ease, border-radius 180ms ease, box-shadow 180ms ease;
   }
 
   .builder-widget.is-left .builder-bubble {
+    right: auto;
+    left: 0;
     border-radius: 0 1.5rem 1.5rem 0;
+  }
+
+  .builder-widget:hover .builder-bubble,
+  .builder-widget:focus-within .builder-bubble {
+    width: 10rem;
+  }
+
+  .builder-widget.is-dragging .builder-bubble {
+    width: 100%;
   }
 
   .builder-bubble:active,
@@ -51,37 +68,46 @@
     box-shadow: 0 9px 24px rgba(28, 28, 13, 0.26);
   }
 
-  .builder-label {
-    position: absolute;
-    top: 50%;
-    right: 100%;
-    max-width: 10rem;
-    overflow: hidden;
-    white-space: nowrap;
+  .builder-bubble i,
+  .builder-bubble-text {
+    flex: 0 0 auto;
+    transition: opacity 270ms ease;
+  }
+
+  .builder-bubble-text {
     opacity: 0;
-    padding: 0 0.75rem;
+    white-space: nowrap;
     font-size: 0.75rem;
     font-weight: 700;
     letter-spacing: 0.03em;
-    color: #1c1c0d;
-    pointer-events: none;
-    transform: translateY(-50%);
-    transition: opacity 180ms ease;
   }
 
-  .builder-widget.is-left .builder-label {
-    right: auto;
-    left: 100%;
-    text-align: left;
+  .builder-widget:hover .builder-bubble i,
+  .builder-widget:focus-within .builder-bubble i {
+    opacity: 0;
   }
 
-  .builder-widget:hover .builder-label,
-  .builder-widget:focus-within .builder-label {
+  .builder-widget:hover .builder-bubble-text,
+  .builder-widget:focus-within .builder-bubble-text {
     opacity: 1;
   }
 
-  .builder-widget.is-dragging .builder-label {
+  .builder-widget.is-dragging .builder-bubble i {
+    opacity: 1;
+  }
+
+  .builder-widget.is-dragging .builder-bubble-text {
     opacity: 0;
+  }
+
+  .builder-widget:not(.is-left) .builder-bubble {
+    right: 0;
+    left: auto;
+  }
+
+  .builder-widget.is-left .builder-bubble {
+    right: auto;
+    left: 0;
   }
 
   .builder-tooltip {
@@ -154,8 +180,9 @@
       left: 0;
     }
 
-    .builder-label {
-      display: none;
+    .builder-widget:hover .builder-bubble,
+    .builder-widget:focus-within .builder-bubble {
+      width: 100%;
     }
   }
 </style>
@@ -164,9 +191,9 @@
   <% if (showTooltip) { %>
     <div id="builderTooltip" class="builder-tooltip" role="status">Built by Kevan <i class="ri-heart-2-fill" aria-hidden="true"></i></div>
   <% } %>
-  <span class="builder-label" aria-hidden="true">Meet the Builder</span>
   <button id="builderBubble" class="builder-bubble" type="button" aria-label="Meet the Builder" aria-haspopup="dialog" aria-controls="builderModal">
-    <i class="ri-kick-line"></i>
+    <i class="ri-kick-line" aria-hidden="true"></i>
+    <span class="builder-bubble-text">Meet the Builder</span>
   </button>
 </div>
 
@@ -188,7 +215,7 @@
 <script>
   (() => {
     const widget = document.getElementById('builderWidget');
-    const bubble = document.getElementById('builderBubble');
+    const bubble = document.getElementById('builderBubble'); 
     const modal = document.getElementById('builderModal');
     const closeButton = document.getElementById('builderModalClose');
     const tooltip = document.getElementById('builderTooltip');
