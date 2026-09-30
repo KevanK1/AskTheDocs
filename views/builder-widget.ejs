@@ -1,34 +1,37 @@
 <style>
   .builder-widget {
-    --builder-primary: #f9f506;
     position: fixed;
-    right: 1.25rem;
+    right: 0;
     top: 50%;
     z-index: 60;
-    display: flex;
-    align-items: center;
+    width: 2.9rem;
+    height: 2.9rem;
     transform: translateY(-50%);
     touch-action: none;
   }
 
   .builder-widget.is-left {
     right: auto;
-    left: 1.25rem;
+    left: 0;
   }
 
   .builder-bubble {
-    width: 3.25rem;
-    height: 3.25rem;
-    border: 1px solid rgba(28, 28, 13, 0.12);
-    border-radius: 9999px;
-    background: rgba(249, 245, 6, 0.94);
+    width: 100%;
+    height: 100%;
+    border: 1px solid #1c1c0d;
+    border-radius: 1.5rem 0 0 1.5rem;
+    background: #ded3c1;
     color: #1c1c0d;
-    box-shadow: 0 8px 24px rgba(28, 28, 13, 0.16);
+    box-shadow: 0 6px 18px rgba(28, 28, 13, 0.18);
     backdrop-filter: blur(10px);
     cursor: grab;
     display: grid;
     place-items: center;
-    transition: transform 180ms ease, box-shadow 180ms ease;
+    transition: background 180ms ease, border-radius 180ms ease, box-shadow 180ms ease;
+  }
+
+  .builder-widget.is-left .builder-bubble {
+    border-radius: 0 1.5rem 1.5rem 0;
   }
 
   .builder-bubble:active,
@@ -37,34 +40,48 @@
   }
 
   .builder-bubble:hover,
+  .builder-widget:focus-within .builder-bubble {
+    background: #d4c6b1;
+    box-shadow: 0 9px 24px rgba(28, 28, 13, 0.26);
+  }
+
   .builder-widget.is-dragging .builder-bubble {
-    transform: scale(1.08);
-    box-shadow: 0 12px 30px rgba(28, 28, 13, 0.24);
+    border-radius: 50%;
+    background: #d4c6b1;
+    box-shadow: 0 9px 24px rgba(28, 28, 13, 0.26);
   }
 
   .builder-label {
-    max-width: 0;
+    position: absolute;
+    top: 50%;
+    right: 100%;
+    max-width: 10rem;
     overflow: hidden;
     white-space: nowrap;
     opacity: 0;
-    padding: 0;
+    padding: 0 0.75rem;
     font-size: 0.75rem;
     font-weight: 700;
     letter-spacing: 0.03em;
     color: #1c1c0d;
-    transition: max-width 180ms ease, opacity 180ms ease, padding 180ms ease;
+    pointer-events: none;
+    transform: translateY(-50%);
+    transition: opacity 180ms ease;
   }
 
-  .builder-widget:not(.is-left) .builder-label {
-    order: -1;
-    text-align: right;
+  .builder-widget.is-left .builder-label {
+    right: auto;
+    left: 100%;
+    text-align: left;
   }
 
   .builder-widget:hover .builder-label,
   .builder-widget:focus-within .builder-label {
-    max-width: 10rem;
     opacity: 1;
-    padding: 0 0.75rem;
+  }
+
+  .builder-widget.is-dragging .builder-label {
+    opacity: 0;
   }
 
   .builder-tooltip {
@@ -76,7 +93,7 @@
     padding: 0.55rem 0.8rem;
     border-radius: 0.6rem;
     background: #1c1c0d;
-    color: #f8f8f5;
+    color: #e7dcc9;
     font-size: 0.75rem;
     font-weight: 700;
     box-shadow: 0 8px 24px rgba(28, 28, 13, 0.18);
@@ -124,22 +141,20 @@
   .builder-modal-link:focus-visible,
   .builder-bubble:focus-visible,
   .builder-modal-close:focus-visible {
-    outline: 3px solid #f9f506;
+    outline: 3px solid #1c1c0d;
     outline-offset: 3px;
   }
 
   @media (max-width: 640px) {
     .builder-widget {
-      right: 0.8rem;
+      right: 0;
     }
 
     .builder-widget.is-left {
-      left: 0.8rem;
+      left: 0;
     }
 
-    .builder-label,
-    .builder-widget:hover .builder-label,
-    .builder-widget:focus-within .builder-label {
+    .builder-label {
       display: none;
     }
   }
@@ -147,24 +162,24 @@
 
 <div id="builderWidget" class="builder-widget" aria-label="Meet the Builder widget">
   <% if (showTooltip) { %>
-    <div id="builderTooltip" class="builder-tooltip" role="status">Built by Kevan 👋</div>
+    <div id="builderTooltip" class="builder-tooltip" role="status">Built by Kevan <i class="ri-heart-2-fill" aria-hidden="true"></i></div>
   <% } %>
   <span class="builder-label" aria-hidden="true">Meet the Builder</span>
   <button id="builderBubble" class="builder-bubble" type="button" aria-label="Meet the Builder" aria-haspopup="dialog" aria-controls="builderModal">
-    <i class="ri-user-star-line text-xl" aria-hidden="true"></i>
+    <i class="ri-kick-line"></i>
   </button>
 </div>
 
 <div id="builderModal" class="builder-modal hidden fixed inset-0 z-[70] flex items-center justify-center bg-ink/60 px-6 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="builderModalTitle">
   <div class="builder-modal-panel relative rounded-lg bg-background-light p-8 shadow-2xl border border-ink/10 text-ink">
     <button id="builderModalClose" class="builder-modal-close absolute right-5 top-4 text-3xl leading-none text-ink/40 hover:text-ink" type="button" aria-label="Close Meet the Builder dialog">&times;</button>
-    <h2 id="builderModalTitle" class="font-serif text-2xl mb-5">Meet the Builder</h2>
+    <h2 id="builderModalTitle" class="font-serif text-2xl mb-5">It's me, Kevan</h2>
     <p class="text-sm leading-relaxed text-ink/70 mb-6">Software Engineer at Capgemini, focused on SAP ABAP, RAP, Full Stack Development, and AI-powered applications. I enjoy building practical software, exploring modern SAP technologies, and sharing what I learn through technical writing and personal projects.</p>
     <div class="space-y-3 text-sm">
       <a class="builder-modal-link flex items-center gap-3 hover:text-ink/60" href="mailto:kevantamboli@gmail.com"><i class="ri-mail-send-line text-lg" aria-hidden="true"></i> Email</a>
       <a class="builder-modal-link flex items-center gap-3 hover:text-ink/60" href="https://www.linkedin.com/in/kevan-tamboli" target="_blank" rel="noreferrer"><i class="ri-linkedin-box-fill text-lg" aria-hidden="true"></i> LinkedIn</a>
       <a class="builder-modal-link flex items-center gap-3 hover:text-ink/60" href="https://github.com/KevanK1" target="_blank" rel="noreferrer"><i class="ri-github-fill text-lg" aria-hidden="true"></i> GitHub</a>
-      <a class="builder-modal-link flex items-center gap-3 hover:text-ink/60" href="/blog"><i class="ri-pencil-line text-lg" aria-hidden="true"></i> Technical Blog</a>
+      <a class="builder-modal-link flex items-center gap-3 hover:text-ink/60" href="https://medium.com/@kevantamboli" target="_blank" rel="noreferrer"><i class="ri-pencil-line text-lg" aria-hidden="true"></i> Medium</a>
     </div>
     <p class="mt-6 border-t border-ink/10 pt-5 text-xs leading-relaxed text-ink/60">Open to discussing SAP development, full stack projects, AI applications, and software engineering opportunities.</p>
   </div>
@@ -213,13 +228,16 @@
       try {
         const saved = JSON.parse(localStorage.getItem(storageKey));
         if (saved && Number.isFinite(saved.left) && Number.isFinite(saved.top)) {
-          applyPosition(saved);
+          applyPosition({
+            left: saved.left <= window.innerWidth / 2 ? 0 : window.innerWidth - widget.offsetWidth,
+            top: saved.top
+          });
           return;
         }
       } catch (error) {
         localStorage.removeItem(storageKey);
       }
-      applyPosition({ left: window.innerWidth - widget.offsetWidth - 20, top: (window.innerHeight - widget.offsetHeight) / 2 });
+      applyPosition({ left: window.innerWidth - widget.offsetWidth, top: (window.innerHeight - widget.offsetHeight) / 2 });
     };
 
     const openModal = () => {
