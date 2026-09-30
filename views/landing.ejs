@@ -5,10 +5,10 @@
   <meta charset="utf-8" />
   <meta content="width=device-width, initial-scale=1.0" name="viewport" />
   <title>Research Engine - AI Web Scraping</title>
-  <link href="https://googleapis.com" rel="preconnect" />
-  <link crossorigin="" href="https://gstatic.com" rel="preconnect" />
+  <link href="https://fonts.googleapis.com" rel="preconnect" />
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
   <link
-    href="https://googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Spline+Sans:wght@300..700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Spline+Sans:wght@300..700&family=Material+Symbols+Outlined:wght@100..700&display=swap"
     rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -116,11 +116,12 @@
             Receive context-grounded answers instantly, powered by a semantic
             understanding engine that reads like a human researcher.
           </p>
-          <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-            <a href="/tool"
+          <div class="relative flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+            <a id="startLink" href="/tool"
               class="h-12 px-8 rounded-full bg-primary text-ink font-bold text-sm tracking-wide hover:bg-[#e0dd05] transition-colors flex items-center justify-center min-w-[140px]">
               Let's Start
             </a>
+            <span id="loginNotice" class="hidden absolute mt-[-4.5rem] rounded-lg bg-ink px-4 py-2 text-xs font-bold text-background-light shadow-lg">Login to move forward.</span>
             <a class="h-12 px-8 rounded-full border border-ink/20 text-ink font-medium text-sm tracking-wide hover:bg-ink/5 transition-colors flex items-center justify-center min-w-[140px]"
               href="#how-it-works">
               How it works
@@ -281,13 +282,13 @@
     </main>
 
     <!-- The Re-engineered Secure Login Modal Container Component -->
-    <div id="cta-login" class="<%= locals.message || locals.step === 'verify' ? '' : 'hidden' %> fixed inset-0 z-50 flex items-center justify-center bg-ink/60 px-6 backdrop-blur-sm animate-fade-in" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+    <div id="cta-login" class="<%= locals.message ? '' : 'hidden' %> fixed inset-0 z-50 flex items-center justify-center bg-ink/60 px-6 backdrop-blur-sm animate-fade-in" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
       <div class="w-full max-w-md rounded-lg bg-background-light p-8 shadow-2xl border border-ink/10 relative">
         <div class="mb-6 flex items-start justify-between gap-4">
           <div>
             <p class="mb-1 text-xs font-bold uppercase tracking-[0.15em] text-ink/50">Developer Gateway</p>
             <h2 id="loginTitle" class="font-serif text-2xl text-ink font-normal">
-              <%= locals.step === 'verify' ? 'Confirm OTP Access' : 'Secure Verification' %>
+              Secure Verification
             </h2>
           </div>
           <button type="button" id="closeLogin" class="text-3xl leading-none text-ink/40 hover:text-ink transition-colors" aria-label="Close login">&times;</button>
@@ -299,22 +300,7 @@
           </div>
         <% } %>
 
-        <% if (locals.step === 'verify') { %>
-          <form method="post" action="/auth/verify-otp" class="space-y-4">
-            <input type="hidden" name="email" value="<%= email %>" />
-            <div class="space-y-2">
-              <label class="block text-xs font-bold uppercase tracking-wider text-ink/60" for="otpToken">Enter 6-Digit Code</label>
-              <input id="otpToken" name="otpToken" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required
-                class="h-12 w-full rounded-full border border-ink/20 bg-white px-5 text-center text-xl font-bold tracking-[0.5em] text-ink outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                placeholder="123456" />
-            </div>
-            <button type="submit" class="h-12 w-full rounded-full bg-primary font-bold text-ink hover:bg-[#e0dd05] shadow-sm tracking-wide text-sm transition-colors mt-2">
-              Verify Token
-            </button>
-          </form>
-          <p class="mt-4 text-center text-xs text-ink/50 font-light">Numerical access token dispatched to <strong><%= email %></strong></p>
-        <% } else { %>
-          <form method="post" action="/auth/send-otp" class="space-y-4">
+        <form id="loginForm" method="post" action="/auth/send-link" class="space-y-4">
             <div class="space-y-2">
               <label class="block text-xs font-bold uppercase tracking-wider text-ink/60" for="loginEmail">Email Address</label>
               <input id="loginEmail" name="email" type="email" autocomplete="email" required
@@ -322,11 +308,11 @@
                 placeholder="developer@domain.com" />
             </div>
             <button type="submit" class="h-12 w-full rounded-full bg-primary font-bold text-ink hover:bg-[#e0dd05] shadow-sm tracking-wide text-sm transition-colors mt-2">
-              Send Passcode
+              Email Me a Sign-in Link
             </button>
           </form>
           <p class="mt-4 text-center text-xs text-ink/40 font-light">Your email is monitored solely to enforce the 3-prompt sandbox limit.</p>
-        <% } %>
+        <div id="authStatus" class="hidden text-center text-sm text-ink/70">Authenticating ...</div>
       </div>
     </div>
 
@@ -351,6 +337,10 @@
     const loginLink = document.getElementById('loginLink');
     const mobileLoginLink = document.getElementById('mobileLoginLink');
     const closeLogin = document.getElementById('closeLogin');
+    const startLink = document.getElementById('startLink');
+    const loginNotice = document.getElementById('loginNotice');
+    const loginForm = document.getElementById('loginForm');
+    const authStatus = document.getElementById('authStatus');
 
     const openLogin = (event) => {
       event.preventDefault();
@@ -360,6 +350,14 @@
     // Attach event listeners safely
     loginLink?.addEventListener('click', openLogin);
     mobileLoginLink?.addEventListener('click', openLogin);
+
+    startLink?.addEventListener('click', (event) => {
+      if (<%= locals.user ? 'true' : 'false' %>) return;
+      event.preventDefault();
+      loginNotice?.classList.remove('hidden');
+      loginModal?.classList.remove('hidden');
+      window.setTimeout(() => loginNotice?.classList.add('hidden'), 2500);
+    });
 
     closeLogin?.addEventListener('click', () => loginModal?.classList.add('hidden'));
     
@@ -387,14 +385,16 @@
       if (accessToken) {
         if (loginModal) {
           loginModal.classList.remove('hidden');
+          loginForm?.classList.add('hidden');
+          authStatus?.classList.remove('hidden');
           const titleEl = document.getElementById('loginTitle');
-          if (titleEl) titleEl.innerText = 'Authenticating link...';
+          if (titleEl) titleEl.innerText = 'Authenticating ...';
         }
 
-        fetch('/auth/verify-otp', {
+        fetch('/auth/verify-link', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ isLinkRedirect: true, token: accessToken })
+          body: JSON.stringify({ token: accessToken })
         })
         .then(response => {
           if (response.ok) {

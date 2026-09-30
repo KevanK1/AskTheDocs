@@ -29,95 +29,74 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// 1. Clean Anonymous Landing View Route
+// 1. Render the landing page with the current application session.
 app.get('/', (req, res) => {
-  res.render('landing', { user: null, message: null, step: null });
+  const session = app.locals.activeSession;
+  res.render('landing', { user: session?.user || null, message: null, authenticating: false });
 });
 
-// 2. Submit user email to trigger the 6-digit OTP delivery
-app.post('/auth/send-otp', async (req, res) => {
+// 2. Submit user email to trigger a passwordless sign-in link.
+app.post('/auth/send-link', async (req, res) => {
   const email = req.body.email?.trim().toLowerCase();
   if (!email) {
-    return res.render('landing', { user: null, message: 'Please enter a valid email address.', step: null });
+    return res.render('landing', { user: null, message: 'Please enter a valid email address.', authenticating: false });
   }
 
-  // 🛡️ FIX: Force the standard system to bypass Magic Links and deploy a text token string
-  const { error } = await supabase.auth.signInWithOtp({ 
+  const { error } = await supabase.auth.signInWithOtp({
     email,
     options: {
-      shouldCreateUser: true
+      shouldCreateUser: true,
+      emailRedirectTo: `${req.protocol}://${req.get('host')}/`
     }
   });
   
   if (error) {
-    return res.render('landing', { user: null, message: error.message, step: null });
+    return res.render('landing', { user: null, message: error.message, authenticating: false });
   }
-  
-  res.render('landing', { user: null, step: 'verify', email, message: 'A 6-digit verification code was sent to your inbox.' });
+
+  res.render('landing', { user: null, message: 'Check your inbox for your sign-in link.', authenticating: false });
 });
 
-// 3. Confirm authentication access token payload for code or email-link logins
-app.post('/auth/verify-otp', async (req, res) => {
-  const isLinkRedirect = req.body.isLinkRedirect === true || req.body.isLinkRedirect === 'true';
+// 3. Confirm the access token received from a Supabase email-link redirect.
+app.post('/auth/verify-link', async (req, res) => {
   const token = req.body.token?.trim();
-  const email = req.body.email?.trim().toLowerCase();
-  const otpToken = req.body.otpToken?.trim();
-
-  let sessionToken = token;
-  let activeUser = null;
 
   try {
-    if (isLinkRedirect) {
-      if (!sessionToken) {
-        return res.status(401).json({ error: 'Link session token is required.' });
-      }
+    if (!token) {
+      return res.status(401).json({ error: 'Link session token is required.' });
+    }
 
-      const { data: { user }, error } = await supabase.auth.getUser(sessionToken);
-      if (error || !user) {
-        return res.status(401).json({ error: 'Link expired or invalid session state.' });
-      }
-      activeUser = user;
-    } else {
-      if (!email || !otpToken) {
-        return res.render('landing', { user: null, message: 'Enter the validation code.', step: 'verify', email });
-      }
-
-      const { data, error } = await supabase.auth.verifyOtp({ email, token: otpToken, type: 'email' });
-      if (error || !data.session) {
-        return res.render('landing', { user: null, message: error?.message || 'Invalid passcode.', step: 'verify', email });
-      }
-      activeUser = data.user;
-      sessionToken = data.session.access_token;
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+    if (error || !user) {
+      return res.status(401).json({ error: 'Link expired or invalid session state.' });
     }
 
     const { data: usage } = await supabase
       .from('user_usage')
       .select('prompt_count')
-      .eq('user_id', activeUser.id)
+      .eq('user_id', user.id)
       .single();
     const usageCount = usage ? usage.prompt_count : 0;
 
-    if (isLinkRedirect) {
-      app.locals.activeSession = { user: activeUser, token: sessionToken, usageCount };
-      return res.status(200).json({ status: 'success' });
-    }
-
-    return res.render('tool', { user: activeUser, token: sessionToken, usageCount });
+    app.locals.activeSession = { user, token, usageCount };
+    return res.status(200).json({ status: 'success' });
   } catch (err) {
-    console.error('Server error during code processing:', err);
-    return isLinkRedirect
-      ? res.status(500).json({ error: 'Backend connection processing failure.' })
-      : res.render('landing', { user: null, message: 'System processing error context.', step: null });
+    console.error('Server error during link processing:', err);
+    return res.status(500).json({ error: 'Backend connection processing failure.' });
   }
 });
 
-// Clean workspace gate for link-based logins
+// 4. Keep the active session available when navigating back to the landing page.
 app.get('/tool', (req, res) => {
   if (app.locals.activeSession) {
     const { user, token, usageCount } = app.locals.activeSession;
-    app.locals.activeSession = null;
     return res.render('tool', { user, token, usageCount });
   }
+  res.redirect('/');
+});
+
+app.get('/auth/logout', (req, res) => {
+  app.locals.activeSession = null;
   res.redirect('/');
 });
 
