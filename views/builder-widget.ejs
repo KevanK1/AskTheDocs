@@ -1,0 +1,318 @@
+<style>
+  .builder-widget {
+    --builder-primary: #f9f506;
+    position: fixed;
+    right: 1.25rem;
+    top: 50%;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    transform: translateY(-50%);
+    touch-action: none;
+  }
+
+  .builder-widget.is-left {
+    right: auto;
+    left: 1.25rem;
+  }
+
+  .builder-bubble {
+    width: 3.25rem;
+    height: 3.25rem;
+    border: 1px solid rgba(28, 28, 13, 0.12);
+    border-radius: 9999px;
+    background: rgba(249, 245, 6, 0.94);
+    color: #1c1c0d;
+    box-shadow: 0 8px 24px rgba(28, 28, 13, 0.16);
+    backdrop-filter: blur(10px);
+    cursor: grab;
+    display: grid;
+    place-items: center;
+    transition: transform 180ms ease, box-shadow 180ms ease;
+  }
+
+  .builder-bubble:active,
+  .builder-widget.is-dragging .builder-bubble {
+    cursor: grabbing;
+  }
+
+  .builder-bubble:hover,
+  .builder-widget.is-dragging .builder-bubble {
+    transform: scale(1.08);
+    box-shadow: 0 12px 30px rgba(28, 28, 13, 0.24);
+  }
+
+  .builder-label {
+    max-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    opacity: 0;
+    padding: 0;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    color: #1c1c0d;
+    transition: max-width 180ms ease, opacity 180ms ease, padding 180ms ease;
+  }
+
+  .builder-widget:not(.is-left) .builder-label {
+    order: -1;
+    text-align: right;
+  }
+
+  .builder-widget:hover .builder-label,
+  .builder-widget:focus-within .builder-label {
+    max-width: 10rem;
+    opacity: 1;
+    padding: 0 0.75rem;
+  }
+
+  .builder-tooltip {
+    position: absolute;
+    right: 0;
+    bottom: calc(100% + 0.75rem);
+    width: max-content;
+    max-width: 14rem;
+    padding: 0.55rem 0.8rem;
+    border-radius: 0.6rem;
+    background: #1c1c0d;
+    color: #f8f8f5;
+    font-size: 0.75rem;
+    font-weight: 700;
+    box-shadow: 0 8px 24px rgba(28, 28, 13, 0.18);
+    animation: builderTooltipIn 240ms ease-out;
+  }
+
+  .builder-widget.is-left .builder-tooltip {
+    right: auto;
+    left: 0;
+  }
+
+  .builder-tooltip::after {
+    content: "";
+    position: absolute;
+    right: 1rem;
+    bottom: -0.35rem;
+    width: 0.7rem;
+    height: 0.7rem;
+    background: #1c1c0d;
+    transform: rotate(45deg);
+  }
+
+  .builder-widget.is-left .builder-tooltip::after {
+    right: auto;
+    left: 1rem;
+  }
+
+  @keyframes builderTooltipIn {
+    from { opacity: 0; transform: translateY(0.35rem); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .builder-modal-panel {
+    width: min(100%, 34rem);
+    transform: scale(0.96);
+    opacity: 0;
+    transition: transform 180ms ease, opacity 180ms ease;
+  }
+
+  .builder-modal:not(.hidden) .builder-modal-panel {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  .builder-modal-link:focus-visible,
+  .builder-bubble:focus-visible,
+  .builder-modal-close:focus-visible {
+    outline: 3px solid #f9f506;
+    outline-offset: 3px;
+  }
+
+  @media (max-width: 640px) {
+    .builder-widget {
+      right: 0.8rem;
+    }
+
+    .builder-widget.is-left {
+      left: 0.8rem;
+    }
+
+    .builder-label,
+    .builder-widget:hover .builder-label,
+    .builder-widget:focus-within .builder-label {
+      display: none;
+    }
+  }
+</style>
+
+<div id="builderWidget" class="builder-widget" aria-label="Meet the Builder widget">
+  <% if (showTooltip) { %>
+    <div id="builderTooltip" class="builder-tooltip" role="status">Built by Kevan 👋</div>
+  <% } %>
+  <span class="builder-label" aria-hidden="true">Meet the Builder</span>
+  <button id="builderBubble" class="builder-bubble" type="button" aria-label="Meet the Builder" aria-haspopup="dialog" aria-controls="builderModal">
+    <i class="ri-user-star-line text-xl" aria-hidden="true"></i>
+  </button>
+</div>
+
+<div id="builderModal" class="builder-modal hidden fixed inset-0 z-[70] flex items-center justify-center bg-ink/60 px-6 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="builderModalTitle">
+  <div class="builder-modal-panel relative rounded-lg bg-background-light p-8 shadow-2xl border border-ink/10 text-ink">
+    <button id="builderModalClose" class="builder-modal-close absolute right-5 top-4 text-3xl leading-none text-ink/40 hover:text-ink" type="button" aria-label="Close Meet the Builder dialog">&times;</button>
+    <h2 id="builderModalTitle" class="font-serif text-2xl mb-5">Meet the Builder</h2>
+    <p class="text-sm leading-relaxed text-ink/70 mb-6">Software Engineer at Capgemini, focused on SAP ABAP, RAP, Full Stack Development, and AI-powered applications. I enjoy building practical software, exploring modern SAP technologies, and sharing what I learn through technical writing and personal projects.</p>
+    <div class="space-y-3 text-sm">
+      <a class="builder-modal-link flex items-center gap-3 hover:text-ink/60" href="mailto:kevantamboli@gmail.com"><i class="ri-mail-send-line text-lg" aria-hidden="true"></i> Email</a>
+      <a class="builder-modal-link flex items-center gap-3 hover:text-ink/60" href="https://www.linkedin.com/in/kevan-tamboli" target="_blank" rel="noreferrer"><i class="ri-linkedin-box-fill text-lg" aria-hidden="true"></i> LinkedIn</a>
+      <a class="builder-modal-link flex items-center gap-3 hover:text-ink/60" href="https://github.com/KevanK1" target="_blank" rel="noreferrer"><i class="ri-github-fill text-lg" aria-hidden="true"></i> GitHub</a>
+      <a class="builder-modal-link flex items-center gap-3 hover:text-ink/60" href="/blog"><i class="ri-pencil-line text-lg" aria-hidden="true"></i> Technical Blog</a>
+    </div>
+    <p class="mt-6 border-t border-ink/10 pt-5 text-xs leading-relaxed text-ink/60">Open to discussing SAP development, full stack projects, AI applications, and software engineering opportunities.</p>
+  </div>
+</div>
+
+<script>
+  (() => {
+    const widget = document.getElementById('builderWidget');
+    const bubble = document.getElementById('builderBubble');
+    const modal = document.getElementById('builderModal');
+    const closeButton = document.getElementById('builderModalClose');
+    const tooltip = document.getElementById('builderTooltip');
+    const storageKey = 'askTheDocs.builderWidget.position';
+    let dragState = null;
+    let lastFocusedElement = null;
+
+    const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+
+    const applyPosition = (position) => {
+      const maxLeft = Math.max(0, window.innerWidth - widget.offsetWidth);
+      const maxTop = Math.max(0, window.innerHeight - widget.offsetHeight);
+      const left = clamp(position.left, 0, maxLeft);
+      const top = clamp(position.top, 0, maxTop);
+      widget.style.left = `${left}px`;
+      widget.style.top = `${top}px`;
+      widget.style.right = 'auto';
+      widget.style.transform = 'none';
+      widget.classList.toggle('is-left', left <= window.innerWidth / 2);
+    };
+
+    const savePosition = () => {
+      localStorage.setItem(storageKey, JSON.stringify({
+        left: widget.offsetLeft,
+        top: widget.offsetTop
+      }));
+    };
+
+    const snapToEdge = () => {
+      const maxLeft = Math.max(0, window.innerWidth - widget.offsetWidth);
+      const left = widget.offsetLeft <= window.innerWidth / 2 ? 0 : maxLeft;
+      applyPosition({ left, top: widget.offsetTop });
+      savePosition();
+    };
+
+    const restorePosition = () => {
+      try {
+        const saved = JSON.parse(localStorage.getItem(storageKey));
+        if (saved && Number.isFinite(saved.left) && Number.isFinite(saved.top)) {
+          applyPosition(saved);
+          return;
+        }
+      } catch (error) {
+        localStorage.removeItem(storageKey);
+      }
+      applyPosition({ left: window.innerWidth - widget.offsetWidth - 20, top: (window.innerHeight - widget.offsetHeight) / 2 });
+    };
+
+    const openModal = () => {
+      lastFocusedElement = document.activeElement;
+      modal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+      closeButton.focus();
+    };
+
+    const closeModal = () => {
+      modal.classList.add('hidden');
+      document.body.style.overflow = '';
+      lastFocusedElement?.focus();
+    };
+
+    bubble.addEventListener('pointerdown', (event) => {
+      dragState = { pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, left: widget.offsetLeft, top: widget.offsetTop, moved: false };
+      widget.classList.add('is-dragging');
+      bubble.setPointerCapture(event.pointerId);
+    });
+
+    bubble.addEventListener('pointermove', (event) => {
+      if (!dragState) return;
+      const deltaX = event.clientX - dragState.startX;
+      const deltaY = event.clientY - dragState.startY;
+      if (Math.abs(deltaX) > 4 || Math.abs(deltaY) > 4) dragState.moved = true;
+      applyPosition({ left: dragState.left + deltaX, top: dragState.top + deltaY });
+    });
+
+    bubble.addEventListener('pointerup', () => {
+      if (!dragState) return;
+      const wasDragged = dragState.moved;
+      dragState = null;
+      widget.classList.remove('is-dragging');
+      snapToEdge();
+      if (!wasDragged) openModal();
+    });
+
+    bubble.addEventListener('pointercancel', () => {
+      dragState = null;
+      widget.classList.remove('is-dragging');
+      snapToEdge();
+    });
+
+    bubble.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        openModal();
+      }
+    });
+
+    closeButton.addEventListener('click', closeModal);
+    modal.addEventListener('click', (event) => {
+      if (event.target === modal) closeModal();
+    });
+
+    modal.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        closeModal();
+        return;
+      }
+      if (event.key !== 'Tab') return;
+      const focusable = modal.querySelectorAll('a[href], button:not([disabled])');
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    });
+
+    window.addEventListener('resize', () => {
+      applyPosition({ left: widget.offsetLeft, top: widget.offsetTop });
+      savePosition();
+    });
+
+    restorePosition();
+
+    if (tooltip) {
+      const dismissTooltip = () => {
+        tooltip.remove();
+        localStorage.setItem('askTheDocs.builderTooltipDismissed', 'true');
+      };
+      if (localStorage.getItem('askTheDocs.builderTooltipDismissed') === 'true') {
+        tooltip.remove();
+      } else {
+        window.setTimeout(dismissTooltip, 5000);
+        bubble.addEventListener('pointerdown', dismissTooltip, { once: true });
+      }
+    }
+  })();
+</script>
