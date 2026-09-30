@@ -14,12 +14,13 @@ ${question}`;
 
 async function askQuestion(extractedText, question) {
     const apiKey = process.env.AI_API_KEY;
-    const apiUrl = process.env.AI_API_URL;
+    const baseUrl = process.env.AI_API_URL;
+    const model = process.env.AI_MODEL;
 
     if (!apiKey) {
         throw new Error('AI API key not configured');
     }
-    if (!apiUrl) {
+    if (!baseUrl) {
         throw new Error('AI API URL not configured');
     }
 
@@ -27,38 +28,38 @@ async function askQuestion(extractedText, question) {
 
     try {
         const response = await axios.post(
-            `${apiUrl}?key=${apiKey}`,
+            `${baseUrl.replace(/\/$/, '')}/chat/completions`,
             {
-                contents: [{
-                    parts: [{
-                        text: prompt
-                    }]
-                }],
-                generationConfig: {
-                    temperature: 0.3,
-                    maxOutputTokens: 500
-                }
+                model,
+                messages: [
+                    {
+                        role: 'user',
+                        content: prompt
+                    }
+                ],
+                temperature: 0.3,
+                max_tokens: 500
             },
             {
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${apiKey}`
                 },
                 timeout: 30000
             }
         );
 
         if (
-            response.data.candidates &&
-            response.data.candidates.length > 0 &&
-            response.data.candidates[0].content &&
-            response.data.candidates[0].content.parts &&
-            response.data.candidates[0].content.parts.length > 0
+            response.data.choices &&
+            response.data.choices.length > 0 &&
+            response.data.choices[0].message &&
+            response.data.choices[0].message.content
         ) {
-            const answer = response.data.candidates[0].content.parts[0].text.trim();
+            const answer = response.data.choices[0].message.content.trim();
             return answer;
         }
 
-        throw new Error('Gemini returned no response');
+        throw new Error('AI provider returned no response');
 
     } catch (err) {
         console.error('AI service error:', err.response?.data || err.message);
