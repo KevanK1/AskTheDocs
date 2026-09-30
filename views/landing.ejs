@@ -60,7 +60,7 @@
   class="bg-background-light dark:bg-background-dark text-ink dark:text-background-light font-display antialiased smooth-scroll selection:bg-primary selection:text-ink overflow-x-hidden">
   <div class="relative flex min-h-screen flex-col">
     <!-- Header -->
-    <header class="w-full px-6 py-4 md:py-6 flex justify-center border-b border-ink/5 bg-background-light/80 backdrop-blur sticky top-0 z-40">
+    <header class="relative w-full px-6 py-4 md:py-6 flex justify-center border-b border-ink/5 bg-background-light/80 backdrop-blur sticky top-0 z-40">
       <div class="w-full max-w-[1000px] flex items-center justify-between gap-4">
         <a href="/" class="flex items-center gap-2 group cursor-pointer shrink-0">
           <span class="material-symbols-outlined text-2xl md:text-3xl transition-transform group-hover:scale-110">youtube_searched_for</span>
@@ -84,15 +84,20 @@
           <% } %>
         </nav>
 
-        <!-- Mobile Context Actions Button Panel -->
-        <div class="flex md:hidden items-center gap-2">
-          <% if (locals.user) { %>
-            <a class="h-8 px-3 rounded-full border border-red-200 text-red-600 font-bold text-[10px] uppercase tracking-wider flex items-center justify-center" href="/auth/logout">Logout</a>
-          <% } else { %>
-            <button id="mobileLoginLink" class="h-8 px-4 rounded-full bg-primary text-ink font-bold text-xs tracking-wide hover:bg-[#e0dd05] transition-colors flex items-center justify-center">
-              Login
-            </button>
-          <% } %>
+        <button id="mobileMenuButton" class="md:hidden text-ink" type="button" aria-label="Open navigation" aria-expanded="false">
+          <span class="material-symbols-outlined">menu</span>
+        </button>
+        <div id="mobileMenu" class="hidden absolute left-6 right-6 top-full mt-2 rounded-lg border border-ink/10 bg-background-light p-4 shadow-xl md:hidden">
+          <div class="flex flex-col gap-4 text-sm font-medium text-ink/70">
+            <a href="#documentation">Documentation</a>
+            <a href="#manifesto">Manifesto</a>
+            <a href="#how-it-works">System Logic</a>
+            <% if (locals.user) { %>
+              <a class="text-red-600 font-bold" href="/auth/logout">Logout</a>
+            <% } else { %>
+              <button id="mobileLoginLink" class="text-left text-ink font-bold" type="button">Login</button>
+            <% } %>
+          </div>
         </div>
       </div>
     </header>
@@ -271,7 +276,7 @@
               <input id="heroUrl"
                 class="flex-1 bg-white/10 border border-white/20 text-white placeholder-white/50 rounded-full px-6 h-12 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
                 placeholder="Paste a documentation URL here..." type="text" />
-              <button id="analyzeBtn"
+              <button id="analyzeBtn" type="button"
                 class="h-12 px-8 rounded-full bg-primary text-ink font-bold text-sm tracking-wide hover:bg-[#e0dd05] transition-colors whitespace-nowrap flex items-center justify-center">
                 Analyze
               </button>
@@ -280,6 +285,10 @@
         </div>
       </div>
     </main>
+
+    <%- include('contact') %>
+    <%- include('terms') %>
+    <%- include('privacy') %>
 
     <!-- The Re-engineered Secure Login Modal Container Component -->
     <div id="cta-login" class="<%= locals.message ? '' : 'hidden' %> fixed inset-0 z-50 flex items-center justify-center bg-ink/60 px-6 backdrop-blur-sm animate-fade-in" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
@@ -322,9 +331,9 @@
         class="max-w-[800px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-medium text-ink/50 uppercase tracking-wider">
         <p>© 2026 Research Engine Inc.</p>
         <div class="flex gap-6">
-          <a class="hover:text-ink transition-colors" href="#">Privacy</a>
-          <a class="hover:text-ink transition-colors" href="#">Terms</a>
-          <a class="hover:text-ink transition-colors" href="#">Contact</a>
+          <button class="contentModalLink hover:text-ink transition-colors" data-modal="privacyModal" type="button">Privacy</button>
+          <button class="contentModalLink hover:text-ink transition-colors" data-modal="termsModal" type="button">Terms</button>
+          <button id="contactLink" class="hover:text-ink transition-colors" title="Please login to view contact details of creator" type="button">Contact</button>
         </div>
       </div>
     </footer>
@@ -341,6 +350,8 @@
     const loginNotice = document.getElementById('loginNotice');
     const loginForm = document.getElementById('loginForm');
     const authStatus = document.getElementById('authStatus');
+    const mobileMenuButton = document.getElementById('mobileMenuButton');
+    const mobileMenu = document.getElementById('mobileMenu');
 
     const openLogin = (event) => {
       event.preventDefault();
@@ -350,6 +361,26 @@
     // Attach event listeners safely
     loginLink?.addEventListener('click', openLogin);
     mobileLoginLink?.addEventListener('click', openLogin);
+
+    mobileMenuButton?.addEventListener('click', () => {
+      const isOpen = !mobileMenu?.classList.toggle('hidden');
+      mobileMenuButton.setAttribute('aria-expanded', String(isOpen));
+    });
+
+    document.querySelectorAll('.contentModalLink').forEach((link) => {
+      link.addEventListener('click', () => document.getElementById(link.dataset.modal)?.classList.remove('hidden'));
+    });
+    document.getElementById('contactLink')?.addEventListener('click', () => {
+      <% if (locals.user) { %>
+        document.getElementById('contactModal')?.classList.remove('hidden');
+      <% } else { %>
+        loginNotice?.classList.remove('hidden');
+        window.setTimeout(() => loginNotice?.classList.add('hidden'), 2500);
+      <% } %>
+    });
+    document.querySelectorAll('.closeContentModal').forEach((button) => {
+      button.addEventListener('click', () => button.closest('[role="dialog"]')?.classList.add('hidden'));
+    });
 
     startLink?.addEventListener('click', (event) => {
       if (<%= locals.user ? 'true' : 'false' %>) return;
@@ -368,12 +399,19 @@
     // Handle document parsing trigger button
     document.getElementById('analyzeBtn')?.addEventListener('click', (event) => {
       const url = document.getElementById('heroUrl').value.trim();
-      if (url) {
+      if (!url) return;
+      if (<%= locals.user ? 'true' : 'false' %>) {
         event.preventDefault();
         window.location.href = `/tool?url=${encodeURIComponent(url)}`;
       } else {
-        window.location.href = '/tool';
+        event.preventDefault();
+        loginNotice?.classList.remove('hidden');
+        loginModal?.classList.remove('hidden');
+        window.setTimeout(() => loginNotice?.classList.add('hidden'), 2500);
       }
+    });
+    document.getElementById('heroUrl')?.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') document.getElementById('analyzeBtn')?.click();
     });
 
     // Automatic link interceptor for Supabase email-link redirects

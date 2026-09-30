@@ -1,0 +1,14 @@
+<div id="privacyModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-ink/60 px-6 py-8 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="privacyTitle">
+  <div class="w-full max-w-2xl max-h-[85vh] overflow-y-auto rounded-lg bg-background-light p-8 shadow-2xl border border-ink/10 relative text-ink">
+    <button type="button" class="closeContentModal absolute right-5 top-4 text-3xl leading-none text-ink/40 hover:text-ink" aria-label="Close privacy policy">&times;</button>
+    <h2 id="privacyTitle" class="font-serif text-2xl mb-2">Privacy Policy</h2>
+    <p class="text-xs text-ink/50 mb-6">Last Updated: September 30, 2026</p>
+    <div class="space-y-5 text-sm leading-relaxed text-ink/75">
+      <p>Welcome to Research Engine ("Ask The Docs"). We respect your privacy and are committed to protecting the data you share with us. This Privacy Policy outlines how your information is handled when using our intelligent parsing application.</p>
+      <section><h3 class="font-bold text-ink mb-1">1. Information We Collect</h3><p><strong>Authentication Data:</strong> We collect your email address purely for identity verification, account session routing, and managing system usage allocations.</p><p><strong>Usage Logs:</strong> We log technical request data, including document extraction counts and error states, to maintain performance baselines and enforce operational sandbox thresholds.</p><p><strong>Submitted Content URL Data:</strong> We process the text payloads of the public documentation and blog URLs you explicitly provide for parsing.</p></section>
+      <section><h3 class="font-bold text-ink mb-1">2. How Your Data Is Processed</h3><p><strong>Zero Retention Standard:</strong> We do not index, store, scrape, or resell the contents of the URLs you submit for parsing. Text vectors are processed in high-density volatile context windows solely to synthesize your answer, then immediately discarded from execution memory.</p><p><strong>Third-Party Providers:</strong> We utilize secure backend infrastructure, including Supabase (data management) and Vercel (frontend deployment architecture), to manage active user routing sessions safely.</p></section>
+      <section><h3 class="font-bold text-ink mb-1">3. Data Ownership &amp; Disclosures</h3><p>You retain absolute ownership of the queries you formulate.</p><p>We do not sell, trade, or distribute your identity metadata or processing histories to external commercial entities.</p></section>
+      <section><h3 class="font-bold text-ink mb-1">4. Security &amp; Protection</h3><p>We employ standardized cryptographic encryption models to keep session authentication access tokens safe from network-layer interception.</p></section>
+    </div>
+  </div>
+</div>

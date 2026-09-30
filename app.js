@@ -90,7 +90,7 @@ app.post('/auth/verify-link', async (req, res) => {
 app.get('/tool', (req, res) => {
   if (app.locals.activeSession) {
     const { user, token, usageCount } = app.locals.activeSession;
-    return res.render('tool', { user, token, usageCount });
+    return res.render('tool', { user, token, usageCount, initialUrl: req.query.url || '' });
   }
   res.redirect('/');
 });
